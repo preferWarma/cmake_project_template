@@ -59,7 +59,7 @@ namespace lyf {
     }
 
     // 构造函数
-    stopwatch::stopwatch(double rate) : rate(rate), started(false), stopped(false), tick(0) {}
+    stopwatch::stopwatch(double rate) : started(false), stopped(false),rate(rate), tick(0) {}
     stopwatch::stopwatch(TimeType type) : stopwatch(static_cast<double>(type)) {}
 
     inline void stopwatch::start() {

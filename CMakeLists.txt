@@ -16,13 +16,19 @@ target_link_libraries(${exeFileName} PUBLIC MyLib) # 添加链接库, MyLib为sr
 
 # 编译选项
 target_compile_options(${exeFileName} PUBLIC
-    -Wall
-    -Wextra
-    -Werror
-    -Wno-unknown-warning-option
-    -Wno-int-to-pointer-cast
-    -Wno-class-memaccess
-    -Wno-assume
+
+    "-Wconversion" # 警告隐式转换
+    "-Wunused-variable" # 警告未使用变量
+    "-Wuninitialized" # 警告未初始化变量
+    "-Weffc++" # 警告高效C++(Effective C++)
+    "-Wno-return-type" # 警告未返回值
+    "-Wdelete-non-virtual-dtor" # 警告delete时非虚析构函数
+    "-Wparentheses" # 警告括号
+    "-Wempty-body" # 警告空语句
+    "-Wsuggest-override" # 警告建议override
+    "-Werror=mismatched-new-delete" # new和delete不匹配
+    "-Werror=return-type" # 返回值类型错误
+    "-Wimplicit-fallthrough" # 隐式跌落(用于switch中不加break的情况)
 )
 
 # 以下是添加测试文件的使用(方便单文件测试运行)

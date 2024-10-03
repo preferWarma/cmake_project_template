@@ -148,3 +148,11 @@ void operator delete(void* ptr, std::size_t size) noexcept {
 void operator delete[](void* ptr, std::size_t size) noexcept {
     operator delete[](ptr);
 }
+
+void operator delete(void* ptr, const char* file, unsigned long line) {
+    operator delete(ptr);
+}
+
+void operator delete[](void* ptr, const char* file, unsigned long line) {
+    operator delete[](ptr);
+}

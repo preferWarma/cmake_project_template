@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <iostream>
 #include <stdexcept>
 
 namespace lyf {
@@ -91,7 +92,7 @@ stopwatch::stop() {
     }
     stopped  = true;
     end_time = system_clock::now();
-    tick     = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
+    tick     = static_cast<size_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count());
 }
 
 inline void

@@ -28,7 +28,7 @@ namespace lyf {
 	string getTypeName() {
 		string s = __PRETTY_FUNCTION__;
 		auto pos1 = s.find("T = ") + 4;	// +4是为了跳过"T = "这几个字符
-		auto pos2 = s.find_first_of(";", pos1);
+		auto pos2 = s.find_first_of("	]", pos1);
 		return s.substr(pos1, pos2 - pos1);
 	}
 
@@ -52,7 +52,7 @@ namespace lyf {
 		/// @param str 要分隔的字符串
 		/// @param delim 分隔符
 		/// @return 分隔后的字符串数组, 以vector<string>形式返回
-		vector<string> split(const string& str, const char delim) {
+		inline vector<string> split(const string& str, const char delim) {
 			std::stringstream ss(str);
 			string s;
 			vector<string> res;
@@ -67,7 +67,7 @@ namespace lyf {
 		/// @param str 要分隔的字符串
 		/// @param delim 分隔符
 		/// @return 分隔后的字符串数组, 以vector<string>形式返回
-		vector<string> split(const string& str, const string& delim) {
+		inline vector<string> split(const string& str, const string& delim) {
 			size_t pos1 = 0;
 			size_t pos2 = str.find_first_of(delim, pos1);	// 查找第一个分隔符的位置
 			vector<string> res;
@@ -85,7 +85,7 @@ namespace lyf {
 		/// @param str 要匹配的字符串
 		/// @param pattern 要匹配的正则表达式
 		/// @return 匹配后的字符串数组, 以vector<string>形式返回
-		vector<string> regex_match(const string& str, const string& pattern) {
+		inline vector<string> regex_match(const string& str, const string& pattern) {
 			using std::regex, std::smatch, std::sregex_iterator;
 			regex m_pattern{ pattern };
 			auto word_begin = sregex_iterator(str.begin(), str.end(), m_pattern);
@@ -103,7 +103,7 @@ namespace lyf {
 		/// @param old_value 要替换的子串
 		/// @param new_value 替换后的子串
 		/// @return 替换后的字符串
-		string replace_first(const string& str, const string& old_value, const string& new_value) {
+		inline string replace_first(const string& str, const string& old_value, const string& new_value) {
 			string res = str;
 			auto pos = res.find(old_value);
 			if (pos != string::npos) {
@@ -117,7 +117,7 @@ namespace lyf {
 		/// @param old_value 要替换的子串
 		/// @param new_value 替换后的子串
 		/// @return 替换后的字符串
-		string replace_all(const string& str, const string& old_value, const string& new_value) {
+		inline string replace_all(const string& str, const string& old_value, const string& new_value) {
 			string res = str;
 			for (size_t pos = 0; pos != string::npos; pos += new_value.length()) {
 				pos = res.find(old_value, pos);
@@ -134,7 +134,7 @@ namespace lyf {
 		/// @param old_value 要替换的子串
 		/// @param new_value 替换后的子串
 		/// @return 替换后的字符串
-		string replace_last(const string& str, const string& old_value, const string& new_value) {
+		inline string replace_last(const string& str, const string& old_value, const string& new_value) {
 			string res = str;
 			auto pos = res.rfind(old_value);
 			if (pos != string::npos) {
@@ -147,7 +147,7 @@ namespace lyf {
 		/// @param str 要判断的字符串
 		/// @param prefix 前缀字符串
 		/// @return 是否以指定前缀开头
-		bool begin_with(const string& str, const string& prefix) {
+		inline bool begin_with(const string& str, const string& prefix) {
 			for (size_t i = 0; i < prefix.size(); ++i) {
 				if (str[i] != prefix[i]) return false;
 			}
@@ -158,7 +158,7 @@ namespace lyf {
 		/// @param str 要判断的字符串
 		/// @param suffix 后缀字符串
 		/// @return 是否以指定后缀结尾
-		bool end_with(const string& str, const string& suffix) {
+		inline bool end_with(const string& str, const string& suffix) {
 			size_t str_len = str.size();
 			size_t suffix_len = suffix.size();
 			if (str_len < suffix_len) return false;
@@ -171,11 +171,11 @@ namespace lyf {
 
 	namespace PrintTool {
 #if __cplusplus >= 201703L	// C++17以上才编译
-		string printDelim{ " " };
+		static string printDelim{ " " };
 		/// @brief 用于print_args的分隔符, 默认为空格, 单次使用, 调用后会被重置, 可以通过设置delimIsPersist为true使其持久化
 		inline void set_printDelim(std::string_view delim = " ") { printDelim = delim; }
 
-		bool delimIsPersist{ false };
+		static bool delimIsPersist{ false };
 		/// @brief 分隔符是否持久化, 默认不持久化
 		inline void set_printDelimPersist(bool flag = false) { delimIsPersist = flag; }
 

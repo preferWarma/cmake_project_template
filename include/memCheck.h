@@ -5,10 +5,14 @@
 #include <string>
 #include <fstream>
 
+#include "lyf_config.h"
+
+#ifdef LYF_DEBUG
+
 void* operator new(std::size_t, const char*, unsigned long);
 void* operator new[](std::size_t, const char*, unsigned long);
 
-#define new new(__FILE__, __LINE__)
+#define new new (__FILE__, __LINE__)
 
 extern bool __traceFlag;
 #define TRACE_ON() __traceFlag = true
@@ -36,5 +40,15 @@ inline void SET_LOG_TYPE(memCheck::LogType type, const std::string& fileName = "
         __fileStream.open(fileName);
     }
 }
+
+#endif // LYF_DEBUG
+
+#ifndef LYF_DEBUG
+    #define TRACE_ON()
+    #define TRACE_OFF()
+    #define MEM_ON()
+    #define MEM_OFF()
+    #define SET_LOG_TYPE(type, fileName)
+#endif // !LYF_DEBUG
 
 #endif  // MEMCHECK_H

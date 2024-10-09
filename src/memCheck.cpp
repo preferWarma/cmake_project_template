@@ -5,6 +5,8 @@
 #include <fstream>
 #include "memCheck.h"
 
+#ifdef LYF_DEBUG
+
 using std::size_t;
 using std::cout, std::endl;
 using std::string;
@@ -153,3 +155,5 @@ void operator delete(void* ptr, const char* file, unsigned long line) {
 void operator delete[](void* ptr, const char* file, unsigned long line) {
     operator delete[](ptr);
 }
+
+#endif // LYF_DEBUG

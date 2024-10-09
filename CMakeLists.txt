@@ -12,7 +12,8 @@ set(exeFileName main) # 设置可执行文件名称
 
 add_executable(${exeFileName} main.cpp) # 添加可执行文件
 
-target_link_libraries(${exeFileName} PUBLIC MyLib) # 添加链接库, MyLib为src文件夹下CMakeLists.txt中定义的MyLib
+# 添加链接库, MemCheck为src文件夹下CMakeLists.txt中定义的库
+target_link_libraries(${exeFileName} PUBLIC MemCheck)
 
 # 编译选项
 target_compile_options(${exeFileName} PUBLIC
@@ -33,4 +34,4 @@ target_compile_options(${exeFileName} PUBLIC
 
 # 以下是添加测试文件的使用(方便单文件测试运行)
 add_executable(test test.cpp)
-target_link_libraries(test PUBLIC MyLib)
+target_link_libraries(test PUBLIC MemCheck)

@@ -44,7 +44,7 @@ public:
 }; // class StopWatch
 
 // 对TimeType的输出运算符重载
-std::ostream&
+inline std::ostream&
 operator<<(std::ostream& os, stopwatch::TimeType type) {
     switch (type) {
         case stopwatch::TimeType::ns :
@@ -66,7 +66,7 @@ operator<<(std::ostream& os, stopwatch::TimeType type) {
 }
 
 // 构造函数
-stopwatch::stopwatch(double rate)
+inline stopwatch::stopwatch(double rate)
     : started(false),
       stopped(false),
       rate(rate),
@@ -74,7 +74,7 @@ stopwatch::stopwatch(double rate)
       begin_time(system_clock::now()),
       end_time(system_clock::now()) {}
 
-stopwatch::stopwatch(TimeType type)
+inline stopwatch::stopwatch(TimeType type)
     : stopwatch(static_cast<double>(type)) {}
 
 inline void

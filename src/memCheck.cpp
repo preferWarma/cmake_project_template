@@ -1,15 +1,12 @@
 #include <iostream>
 #include <cstdlib>
-#include <cassert>
 #include <cstddef>
 #include <new>
-#include <unordered_map>
 #include <fstream>
 #include "memCheck.h"
 
 using std::size_t;
 using std::cout, std::endl;
-using std::unordered_map;
 using std::string;
 
 #undef new  // 取消new宏定义

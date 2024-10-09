@@ -1,8 +1,10 @@
 #ifndef LYF_H
 #define LYF_H
 
+#include <cassert>
 #include <cxxabi.h>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -278,6 +280,13 @@ namespace lyf {
 		return range_compare(first, last, std::greater<typename std::iterator_traits<Iterator>::value_type>());
 	}
 
+    /// 1. 通用单例模式
+    /// 推荐使用继承方式 class Foo : public Singleton<Foo>
+    /// 此时如果有 auto f1 = Singleton<Foo>::GetInstance();   则编译器会报错阻止拷贝构造，保证单例对象的唯一性
+    /// 
+    /// 2. 对于不继承直接使用单例模式的方式Singleton<Foo2>::GetInstance().printAdress(); 这种方式没有阻止单例的拷贝或赋值, 不推荐使用, 会导致单例失效
+    /// 例如: auto f2 = Singleton<Foo2>::GetInstance();
+    /// 此时f2是一个新的实例，对Singleton<Foo2>::GetInstance()的单例进行了拷贝
 	template <typename T>
 	class Singleton {	// 泛型单例
 	public:
@@ -312,6 +321,19 @@ namespace lyf {
 		if (!condition) {
 			throw std::runtime_error{ what.data() };
 		}
+    }
+
+    /// @brief 随机数生成器
+    /// @tparam T 数据类型
+    /// @param begin 开始值(包含)
+	/// @param end 结束值(不包含)
+    template<class T>
+    T getRandom(T begin, T end) {
+        assert(begin <= end);
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		static std::uniform_int_distribution<T> dis(begin, end);
+		return dis(gen);
 	}
 }	// namespace lyf
 

@@ -18,12 +18,28 @@ bool __activeFlag = false;
 std::ofstream __fileStream;
 memCheck::LogType __logType = memCheck::LogType::Just_Cout;
 
-#define MASK 0x1234'0000'0000'0000
+#define MASK 0x1234'0000'0000'0000UL
+
+template<typename T, typename... Args>
+void print_args(T&& v, Args&&... args) {
+    if (__logType != memCheck::LogType::Just_Cout) {
+        __fileStream << v;
+    }
+    if (__logType != memCheck::LogType::Just_File) {
+        cout << v;
+    }
+    if constexpr (sizeof...(args) > 0) {
+        print_args(std::forward<Args>(args)...);
+    }
+    else {
+        cout << endl;
+    }
+}
 
 namespace {
     struct OtherInfo {
-        const char* file;
-        unsigned long line;
+        const char* fileName;
+        unsigned long long line;
     };
 
     struct ListNodeBase { // 双链表节点
@@ -34,6 +50,7 @@ namespace {
     struct ListNode : ListNodeBase { // 存储信息的节点
         size_t size{};
         OtherInfo info;
+        void* alignment;
     };
 
     ListNodeBase dummyHead; // 虚拟头节点
@@ -44,32 +61,15 @@ namespace {
             bool hasLeak = (next != &dummyHead);
 
             if (hasLeak) {
-                if (__logType != memCheck::LogType::Just_Cout) {
-                    __fileStream << "Leaked memory at: " << endl;
-                }
-                if (__logType != memCheck::LogType::Just_File) {
-                    cout << "Leaked memory at: " << endl;
-                }
+                print_args("Leaked memory at: ");
                 while (next != &dummyHead) {
                     auto node = static_cast<ListNode*>(next);
-                    if (__logType != memCheck::LogType::Just_Cout) {
-                        __fileStream << "\t" << node << " with size: " << (node->size ^ MASK)
-                            << " (file: " << node->info.file << ", line: " << node->info.line << ")\n";
-                    }
-                    if (__logType != memCheck::LogType::Just_File) {
-                        cout << "\t" << node << " with size: " << (node->size ^ MASK)
-                            << " (file: " << node->info.file << ", line: " << node->info.line << ")\n";
-                    }
+                    print_args("\t", node, " with size: ", (node->size ^ MASK), " (file: ", node->info.fileName, ", line: ", node->info.line, ")");
                     next = node->next;
                 }
             }
             else {
-                if (__logType != memCheck::LogType::Just_Cout) {
-                    __fileStream << "No user memory leaks!" << endl;
-                }
-                if (__logType != memCheck::LogType::Just_File) {
-                    cout << "No user memory leaks!" << endl;
-                }
+                print_args("No user memory leaks!");
             }
         }
     };
@@ -87,8 +87,9 @@ void* operator new(std::size_t size, const char* file, unsigned long line) {
     if (__activeFlag) {
         auto node = static_cast<ListNode*>(ptr);
         static_assert(sizeof(void*) == 8, "not 64-bit system");
+        static_assert(sizeof(ListNode) % 16 == 0, "ListNode not assigned");
         node->size = size | MASK;
-        node->info.file = file;
+        node->info.fileName = file;
         node->info.line = line;
         // 插入到链表中
         node->prev = &dummyHead;
@@ -99,12 +100,7 @@ void* operator new(std::size_t size, const char* file, unsigned long line) {
     // 返回用户可见的内存地址
     void* ret_ptr = static_cast<void*>(static_cast<unsigned char*>(ptr) + sizeof(ListNode));
     if (__traceFlag) {
-        if (__logType != memCheck::LogType::Just_Cout) {
-            __fileStream << "Allocated " << size << " bytes at adress: " << ret_ptr << " (file: " << file << "  line: " << line << ")" << endl;
-        }
-        if (__logType != memCheck::LogType::Just_File) {
-            cout << "Allocated " << size << " bytes at adress: " << ret_ptr << " (file: " << file << "  line: " << line << ")" << endl;
-        }
+        print_args("Allocated ", size, " bytes at adress: ", ret_ptr, " (file: ", file, "  line: ", line, ")");
     }
     return ret_ptr;
 }
@@ -114,20 +110,16 @@ void* operator new[](std::size_t size, const char* file, unsigned long line) {
 }
 
 void operator delete(void* ptr) noexcept {
+    if (!ptr) return;
     // ptr指向的是用户可见的内存, 原始分配的内存地址是ptr - sizeof(ListNode)
-    auto node = static_cast<ListNode*>(static_cast<void*>(static_cast<unsigned char*>(ptr) - sizeof(ListNode)));
+    auto node = reinterpret_cast<ListNode*>(static_cast<unsigned char*>(ptr) - sizeof(ListNode));
     if ((node->size & MASK) == MASK) { // 是我们重载的new分配的内存
         // 从链表中删除
         node->prev->next = node->next;
         node->next->prev = node->prev;
         // 输出信息
         if (__traceFlag) {
-            if (__logType != memCheck::LogType::Just_Cout) {
-                __fileStream << "Deallocated memory at adress: " << ptr << endl;
-            }
-            if (__logType != memCheck::LogType::Just_File) {
-                cout << "Deallocated memory at adress: " << ptr << endl;
-            }
+            print_args("Deallocated memory at adress: ", ptr);
         }
         std::free(node);
     }

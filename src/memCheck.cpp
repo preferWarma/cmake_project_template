@@ -18,7 +18,7 @@ bool __activeFlag = false;
 std::ofstream __fileStream;
 memCheck::LogType __logType = memCheck::LogType::Just_Cout;
 
-#define MASK 0x1234'0000'0000'0000UL
+#define MASK 0x1234'4567'8910'1234UL
 
 template<typename T, typename... Args>
 void print_args(T&& v, Args&&... args) {
@@ -48,9 +48,9 @@ namespace {
     };
 
     struct ListNode : ListNodeBase { // 存储信息的节点
-        size_t size{};
+        size_t size{0};
         OtherInfo info;
-        void* alignment;
+        size_t flag{0}; // 若flag位MASK则是我们分配的内存
     };
 
     ListNodeBase dummyHead; // 虚拟头节点
@@ -64,7 +64,7 @@ namespace {
                 print_args("Leaked memory at: ");
                 while (next != &dummyHead) {
                     auto node = static_cast<ListNode*>(next);
-                    print_args("\t", node, " with size: ", (node->size ^ MASK), " (file: ", node->info.fileName, ", line: ", node->info.line, ")");
+                    print_args("\t", node, " with size: ", node->size, " (file: ", node->info.fileName, ", line: ", node->info.line, ")");
                     next = node->next;
                 }
             }
@@ -88,7 +88,8 @@ void* operator new(std::size_t size, const char* file, unsigned long line) {
         auto node = static_cast<ListNode*>(ptr);
         static_assert(sizeof(void*) == 8, "not 64-bit system");
         static_assert(sizeof(ListNode) % 16 == 0, "ListNode not assigned");
-        node->size = size | MASK;
+        node->size = size;
+        node->flag = MASK;
         node->info.fileName = file;
         node->info.line = line;
         // 插入到链表中
@@ -113,7 +114,7 @@ void operator delete(void* ptr) noexcept {
     if (!ptr) return;
     // ptr指向的是用户可见的内存, 原始分配的内存地址是ptr - sizeof(ListNode)
     auto node = reinterpret_cast<ListNode*>(static_cast<unsigned char*>(ptr) - sizeof(ListNode));
-    if ((node->size & MASK) == MASK) { // 是我们重载的new分配的内存
+    if (node->flag == MASK) { // 是我们重载的new分配的内存
         // 从链表中删除
         node->prev->next = node->next;
         node->next->prev = node->prev;

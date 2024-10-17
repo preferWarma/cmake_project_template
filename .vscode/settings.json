@@ -103,14 +103,8 @@
     "editor.suggest.snippetsPreventQuickSuggestions": false, // 控制活动代码段是否阻止快速建议。
     "editor.acceptSuggestionOnEnter": "smart", // 控制是否在按下回车键时，自动接受建议。
     "editor.suggestSelection": "recentlyUsed", // 控制建议选项是否自动选择第一个建议。
-    "window.dialogStyle": "custom", // 控制弹出窗口的样式。
     "debug.showBreakpointsInOverviewRuler": true, // 控制是否在概览栏中显示断点。
-    "code-runner.runInTerminal": true, // 控制是否在终端中运行代码。
-    "code-runner.saveAllFilesBeforeRun": true, // 控制是否在运行前保存所有文件。
-    "code-runner.saveFileBeforeRun": true, // 控制是否在运行前保存文件。
-    "languageTool.language": "en", // 控制语言工具的语言。
     // "C_Cpp.formatting": "vcFormat", // 控制C/C++代码格式化的格式。
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools", // 控制C/C++代码的默认C++标准。
-    "clang-format.executable": "../clang-format"
 }

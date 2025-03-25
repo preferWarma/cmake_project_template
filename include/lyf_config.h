@@ -1,7 +1,7 @@
 #ifndef LYF_CONFIG_H_
 #define LYF_CONFIG_H_
 
-#define DEBUG_ON
+#define DEBUG_OFF
 
 #ifdef DEBUG_ON
     #define LYF_DEBUG

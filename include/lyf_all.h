@@ -828,4 +828,26 @@ private:
     std::function<void()> _func;
 }; // class Defer
 
+// 线程守卫类，用于确保线程在离开作用域时被正确地加入
+class thread_guard {
+public:
+    explicit thread_guard(std::thread& t)
+        : _t(t) {}
+
+    ~thread_guard() {
+        if (_t.joinable()) {
+            _t.join();
+        }
+    }
+
+public:
+    thread_guard(const thread_guard&) = delete;
+    thread_guard&
+    operator=(const thread_guard&)
+        = delete;
+
+private:
+    std::thread& _t;
+}; // class thread_guard
+
 } // namespace lyf

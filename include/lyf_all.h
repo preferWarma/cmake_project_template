@@ -26,6 +26,8 @@
 
 // 用于快捷打印变量名和值的宏
 #define m_print(arg) std::cout << #arg << " = " << arg << std::endl
+// 快捷输出并附带文件行号定位
+#define m_debug(...) std::cout << "[" << __FILE__ << ":" << __LINE__ << "]: " << __VA_ARGS__ << std::endl
 
 // 日志调用宏
 #define LOG_ONLY(...)  lyf::AsyncLogSystem::GetInstance().LogOnly(__VA_ARGS__)
@@ -619,20 +621,25 @@ private:
         : _console(std::cout), _isShutDown(false) {
         string logFilePath = LOG_FILE_PATH;
         string logModeStr  = LOG_MODE;
-        bool toFile        = logModeStr.find("FILE") != string::npos;
-        bool toConsole     = logModeStr.find("CONSOLE") != string::npos;
-
-        // 提取目录和文件名
-        std::filesystem::path logFilePathObj(logFilePath);
-        std::filesystem::path logDir = logFilePathObj.parent_path();
-        // 如果目录不存在，则创建目录
-        if (!std::filesystem::exists(logDir)) {
-            std::filesystem::create_directories(logDir);
+        for (auto& ch : logModeStr) { // 转换为大写, 方便查找
+            ch = std::toupper(ch);
         }
+        bool toFile    = logModeStr.find("FILE") != string::npos;
+        bool toConsole = logModeStr.find("CONSOLE") != string::npos;
 
-        _logFile.open(logFilePath, std::ios::out | std::ios::app);
-        if (!_logFile.is_open()) {
-            throw std::runtime_error("Failed to open log file: " + logFilePath);
+        if (toFile) {
+            // 提取目录和文件名
+            std::filesystem::path logFilePathObj(logFilePath);
+            std::filesystem::path logDir = logFilePathObj.parent_path();
+            // 如果目录不存在，则创建目录
+            if (!std::filesystem::exists(logDir)) {
+                std::filesystem::create_directories(logDir);
+            }
+
+            _logFile.open(logFilePath, std::ios::out | std::ios::app);
+            if (!_logFile.is_open()) {
+                throw std::runtime_error("Failed to open log file: " + logFilePath);
+            }
         }
 
         _worker = std::thread([this, toConsole, toFile]() -> void {

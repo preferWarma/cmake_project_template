@@ -1,4 +1,4 @@
-#include "lyf_all.h"
+#include "lyf.h"
 
 int
 main() {
@@ -11,6 +11,8 @@ main() {
 
     auto str = lyf::FormatMessage("{} format {}", 1, 2);
     LOG_ONLY(str);
+
+    m_print(str);
     m_debug(str);
 
     return 0;

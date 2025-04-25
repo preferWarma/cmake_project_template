@@ -16,6 +16,8 @@ set(LYF_SOURCES
     src/lyf/Test_ThreadPool.cpp
 )
 
+enable_testing() # 启用测试功能
+
 foreach(SOURCE ${LYF_SOURCES})
     get_filename_component(TEST_NAME ${SOURCE} NAME_WE) # 获取文件名
     add_executable(${TEST_NAME} ${SOURCE}) # 添加可执行文件
@@ -25,4 +27,7 @@ foreach(SOURCE ${LYF_SOURCES})
     # 包含测试
     include(GoogleTest)
     gtest_discover_tests(${TEST_NAME})
+
+    # 添加测试
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endforeach(SOURCE ${LYF_SOURCES})

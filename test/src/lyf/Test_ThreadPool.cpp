@@ -4,13 +4,13 @@
 
 // 测试线程池的初始化
 TEST(ThreadPoolTest, Initialization) {
-    lyf::ThreadPool& pool = lyf::ThreadPool::Instance();
+    lyf::ThreadPool& pool = lyf::ThreadPool::GetInstance();
     EXPECT_GT(pool.IdleThreadNum(), 0);
 }
 
 // 测试任务提交和执行
 TEST(ThreadPoolTest, TaskCommitAndExecute) {
-    lyf::ThreadPool& pool = lyf::ThreadPool::Instance();
+    lyf::ThreadPool& pool = lyf::ThreadPool::GetInstance();
 
     auto task = [](int a, int b) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -24,7 +24,7 @@ TEST(ThreadPoolTest, TaskCommitAndExecute) {
 
 // 测试线程池的停止功能
 TEST(ThreadPoolTest, StopThreadPool) {
-    lyf::ThreadPool& pool = lyf::ThreadPool::Instance();
+    lyf::ThreadPool& pool = lyf::ThreadPool::GetInstance();
     pool.Stop();
     EXPECT_THROW(pool.Commit([]() {
         return 1;

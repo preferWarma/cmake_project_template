@@ -7,18 +7,17 @@
 #include <thread>
 #include <vector>
 
+#include "Singleton.h"
+
 namespace lyf {
 
 using std::atomic, std::condition_variable, std::future, std::thread;
 using std::mutex, std::queue, std::unique_lock, std::vector;
 
-class ThreadPool {
-public:
-    ThreadPool(const ThreadPool&) = delete;
-    ThreadPool&
-    operator=(const ThreadPool&)
-        = delete;
+class ThreadPool : public Singleton<ThreadPool> {
+    friend class Singleton<ThreadPool>;
 
+public:
     ThreadPool(size_t threadNum = std::thread::hardware_concurrency())
         : _stop(false), _idleThreadNum(threadNum > 0 ? threadNum : 1) {
         Init();
@@ -32,12 +31,6 @@ public:
     using TaskType = std::packaged_task<void()>;
 
 public:
-    static ThreadPool&
-    Instance() {
-        static ThreadPool instance;
-        return instance;
-    }
-
     size_t
     IdleThreadNum() {
         return _idleThreadNum.load();

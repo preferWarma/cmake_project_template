@@ -38,6 +38,14 @@ getCurrentTime(const string& format = "%Y-%m-%d %H:%M:%S") {
     return buf;
 }
 
+inline string
+formatTime(const std::chrono::system_clock::time_point& timePoint, const std::string& format = "%Y-%m-%d %H:%M:%S") {
+    std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
+    char buf[1024];
+    strftime(buf, sizeof(buf), format.c_str(), localtime(&time));
+    return buf;
+}
+
 class Defer {
 public:
     Defer(std::function<void()> func)

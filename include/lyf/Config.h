@@ -3,7 +3,7 @@
 
 namespace lyf {
 
-const std::string LOG_FILE_PATH = "./log/log.txt";
-const std::string LOG_MODE      = "CONSOLE";
+const std::string LOG_FILE_PATH = "log/log.txt";
+const std::string LOG_MODE      = "CONSOLE | FILE";
 
 } // namespace lyf

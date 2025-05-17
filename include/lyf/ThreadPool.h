@@ -51,7 +51,11 @@ public:
             // 对任务队列加锁
             std::lock_guard<mutex> lock(_mtx);
             _taskQueue.emplace([task]() {
-                (*task)();
+                try {
+                    (*task)();
+                } catch (std::exception& e) {
+                    std::cout << "ThreadPool run task Exception: " << e.what() << std::endl;
+                }
             });
         }
         // 唤醒一个线程执行该任务

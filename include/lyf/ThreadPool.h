@@ -1,6 +1,7 @@
 #pragma once
 #include <atomic>
 #include <condition_variable>
+#include <exception>
 #include <future>
 #include <mutex>
 #include <queue>
@@ -53,8 +54,8 @@ public:
             _taskQueue.emplace([task]() {
                 try {
                     (*task)();
-                } catch (std::exception& e) {
-                    std::cout << "ThreadPool run task Exception: " << e.what() << std::endl;
+                } catch (std::exception& e) { // 此时的异常是 task 抛出的
+                    throw e;                  // 向上抛出异常，此时抛出的是匿名函数捕获的异常
                 }
             });
         }
@@ -82,7 +83,11 @@ public:
                     }
                     // 使用原子操作减少竞态条件
                     --_idleThreadNum;
-                    task(); // 执行任务
+                    try {
+                        task();                   // 执行任务
+                    } catch (std::exception& e) { // 此时捕获的是执行 task 的匿名函数抛出的异常
+                        throw e;                  // 向上抛出异常，此时的异常需被外部捕获处理
+                    }
                     ++_idleThreadNum;
                 }
             });

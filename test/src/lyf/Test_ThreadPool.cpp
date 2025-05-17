@@ -22,6 +22,16 @@ TEST(ThreadPoolTest, TaskCommitAndExecute) {
     EXPECT_EQ(result, 5);
 }
 
+// 测试异常处理
+TEST(ThreadPoolTest, ExceptionHandling) {
+    lyf::ThreadPool& pool = lyf::ThreadPool::GetInstance();
+    auto task             = []() {
+        throw std::runtime_error("Test Exception");
+    };
+    auto future = pool.Commit(task);
+    EXPECT_THROW(future.get(), std::runtime_error);
+}
+
 // 测试线程池的停止功能
 TEST(ThreadPoolTest, StopThreadPool) {
     lyf::ThreadPool& pool = lyf::ThreadPool::GetInstance();
